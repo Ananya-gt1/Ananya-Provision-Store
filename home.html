@@ -40,27 +40,86 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Select location</a>
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Select location
+            </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Current Location</a></li>
+              <li><a class="dropdown-item" href="#" onclick="getLocation(); return false;">Current Location</a></li>
             </ul>
+            <!-- Location output BELOW dropdown link -->
+            <div id="locationOutput" class="mt-1 ms-3 text-light" style="font-size: 0.9rem; white-space: normal;"></div>
           </li>
         </ul>
-
-        <form class="d-flex mx-auto" style="width: 70%;">
-          <input class="form-control me-2" type="search" placeholder='Search for "products"'>
-          <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
-        </form>
-
-        <div class="d-flex align-items-center">
-          <a href="login.html" class="text-light me-4 text-decoration-none text-center">
-            <i class="bi bi-person-circle fs-4"></i><br><small>Login</small>
-          </a>
-          <a href="#" class="text-light text-decoration-none text-center">
-            <i class="bi bi-cart fs-4"></i><br><small>Cart</small>
-          </a>
-        </div>
       </div>
+
+      <script>
+        function getLocation() {
+          const output = document.getElementById("locationOutput");
+          output.textContent = "Fetching location...";
+
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+          } else {
+            output.textContent = "Geolocation not supported.";
+          }
+
+          function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+              .then(response => response.json())
+              .then(data => {
+                const loc = data.address;
+                const locationString = [
+                  loc.road,
+                  loc.suburb,
+                  loc.city || loc.town || loc.village,
+                  loc.state,
+                  loc.country,
+                ].filter(Boolean).join(', ');
+                output.textContent = locationString || "Location details unavailable";
+              })
+              .catch(() => {
+                output.textContent = "Unable to fetch location details.";
+              });
+          }
+
+          function showError(error) {
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                output.textContent = "User denied the request for Geolocation.";
+                break;
+              case error.POSITION_UNAVAILABLE:
+                output.textContent = "Location information is unavailable.";
+                break;
+              case error.TIMEOUT:
+                output.textContent = "The request timed out.";
+                break;
+              default:
+                output.textContent = "An unknown error occurred.";
+                break;
+            }
+          }
+        }
+      </script>
+      
+      <!-- Search Form -->
+
+      <form class="d-flex mx-auto" style="width: 70%;">
+        <input class="form-control me-2" type="search" placeholder='Search for "products"'>
+        <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
+      </form>
+
+      <div class="d-flex align-items-center">
+        <a href="login.html" class="text-light me-4 text-decoration-none text-center">
+          <i class="bi bi-person-circle fs-4"></i><br><small>Login</small>
+        </a>
+        <a href="cart.html" class="text-light text-decoration-none text-center">
+          <i class="bi bi-cart fs-4"></i><br><small>Cart</small>
+        </a>
+      </div>
+    </div>
     </div>
   </nav>
 
