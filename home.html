@@ -22,88 +22,116 @@
         /* Smaller height for mobile */
       }
     }
+
+    .location-card {
+      background-color: #000;
+      color: white;
+      font-size: 0.9rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      width: 350px;
+      /* Change this value as needed */
+      max-width: 100%;
+    }
+
+    .location-card small {
+      color: #aaa;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-block;
+      max-width: 300px;
+      /* adjust based on your design */
+    }
+
+    .dropdown-toggle::after {
+      border-top-color: #fff;
+
+    }
+
+    .fixed-location {
+      position: absolute;
+      top: 70px;
+      /* adjust if navbar height changes */
+      right: 20px;
+      z-index: 1050;
+    }
   </style>
 </head>
 
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3">
-    <div class="container-fluid">
+  <nav class="navbar navbar-expand-lg bg-black navbar-dark py-3">
+    <div class="container-fluid d-flex align-items-center justify-content-between">
       <a class="navbar-brand d-flex align-items-center" href="#">
         <img src="image/logo.png" alt="Logo" width="35" height="35" class="me-2"> Ananya Provision Store
       </a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-        <span class="navbar-toggler-icon"></span>
-      </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Select location
-            </a>
+
+      <div class="container mt-2">
+        <div class="d-none d-md-flex align-items-center bg-black text-white rounded px-3 py-2"
+          style="font-size: 0.8rem; max-width: 250px;">
+          <div>
+            <strong>Delivery in <span id="delivery-time">8</span> minutes</strong><br>
+            <small id="location" title="Fetching location">Detecting...</small>
+          </div>
+          <div class="ms-2 dropdown">
+            <a class="btn btn-sm btn-dark dropdown-toggle" role="button" data-bs-toggle="dropdown"></a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#" onclick="getLocation(); return false;">Current Location</a></li>
+              <li><a class="dropdown-item" onclick="getLocation()">Refresh Location</a></li>
             </ul>
-            <!-- Location output BELOW dropdown link -->
-            <div id="locationOutput" class="mt-1 ms-3 text-light" style="font-size: 0.9rem; white-space: normal;"></div>
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
 
       <script>
         function getLocation() {
-          const output = document.getElementById("locationOutput");
-          output.textContent = "Fetching location...";
-
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition, showError);
           } else {
-            output.textContent = "Geolocation not supported.";
-          }
-
-          function showPosition(position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-
-            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
-              .then(response => response.json())
-              .then(data => {
-                const loc = data.address;
-                const locationString = [
-                  loc.road,
-                  loc.suburb,
-                  loc.city || loc.town || loc.village,
-                  loc.state,
-                  loc.country,
-                ].filter(Boolean).join(', ');
-                output.textContent = locationString || "Location details unavailable";
-              })
-              .catch(() => {
-                output.textContent = "Unable to fetch location details.";
-              });
-          }
-
-          function showError(error) {
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                output.textContent = "User denied the request for Geolocation.";
-                break;
-              case error.POSITION_UNAVAILABLE:
-                output.textContent = "Location information is unavailable.";
-                break;
-              case error.TIMEOUT:
-                output.textContent = "The request timed out.";
-                break;
-              default:
-                output.textContent = "An unknown error occurred.";
-                break;
-            }
+            document.getElementById("location").innerText = "Geolocation is not supported by this browser.";
           }
         }
+
+        function showPosition(position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          // Reverse Geocoding using OpenStreetMap Nominatim API
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+            .then(response => response.json())
+            .then(data => {
+              const address = `${data.address.road || ''}, 
+              ${data.address.city || data.address.town || data.address.village || ''}`;
+
+              document.getElementById("location").innerText = address;
+            })
+            .catch(() => {
+              document.getElementById("location").innerText = "Unable to fetch address.";
+            });
+        }
+
+        function showError(error) {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              document.getElementById("location").innerText = "Location access denied by user.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              document.getElementById("location").innerText = "Location information unavailable.";
+              break;
+            case error.TIMEOUT:
+              document.getElementById("location").innerText = "Location request timed out.";
+              break;
+            default:
+              document.getElementById("location").innerText = "An unknown error occurred.";
+          }
+        }
+
+        // Auto-detect location on load
+        window.onload = getLocation;
       </script>
-      
+
       <!-- Search Form -->
 
       <form class="d-flex mx-auto" style="width: 70%;">
@@ -122,6 +150,7 @@
     </div>
     </div>
   </nav>
+
 
   <!-- Carousel -->
   <div id="mainCarousel" class="carousel slide mt-4" data-bs-ride="carousel">
