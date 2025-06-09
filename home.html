@@ -133,16 +133,107 @@
       </script>
 
       <!-- Search Form -->
+<form class="d-flex mx-auto" style="width: 70%;">
+  <input id="searchInput" class="form-control me-2" type="search" placeholder='Search for "products"'>
+  <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
+</form>
 
-      <form class="d-flex mx-auto" style="width: 70%;">
-        <input class="form-control me-2" type="search" placeholder='Search for "products"'>
-        <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
-      </form>
+<script>
+  // Prevent form from reloading the page
+  document.querySelector("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+  });
 
-      <div class="d-flex align-items-center">
-        <a href="login.html" class="text-light me-4 text-decoration-none text-center">
-          <i class="bi bi-person-circle fs-4"></i><br><small>Login</small>
-        </a>
+  const searchInput = document.getElementById('searchInput');
+  const cards = document.querySelectorAll('#cardContainer .card');
+
+  searchInput.addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+
+    cards.forEach(card => {
+      const title = card.querySelector('.card-title').textContent.toLowerCase();
+      const text = card.querySelector('.card-text').textContent.toLowerCase();
+
+      if (title.includes(query) || text.includes(query)) {
+        card.parentElement.style.display = 'block';
+      } else {
+        card.parentElement.style.display = 'none';
+      }
+    });
+  });
+</script>
+
+     <!-- Login Icon (Click to show form) -->
+<!-- Login Icon -->
+<div class="d-flex align-items-center justify-content-end me-4">
+  <a href="#" class="text-light me-4 text-decoration-none text-center" data-bs-toggle="modal" data-bs-target="#loginModal">
+    <i class="bi bi-person-circle fs-4"></i><br><small>Login</small>
+  </a>
+</div>
+
+<!-- Registration Form Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Sign Up</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form class="row g-3">
+          <div class="col-md-6">
+            <label for="inputName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="inputName" required>
+          </div>
+          <div class="col-md-6">
+            <label for="inputEmail4" class="form-label">Email</label>
+            <input type="email" class="form-control" id="inputEmail4" required>
+          </div>
+          <div class="col-md-6">
+            <label for="inputPassword4" class="form-label">Password</label>
+            <input type="password" class="form-control" id="inputPassword4" required>
+          </div>
+          <div class="col-12">
+            <label for="inputAddress" class="form-label">Address</label>
+            <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St" required>
+          </div>
+          <div class="col-12">
+            <label for="inputAddress2" class="form-label">Landmark</label>
+            <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+          </div>
+          <div class="col-md-6">
+            <label for="inputCity" class="form-label">City</label>
+            <input type="text" class="form-control" id="inputCity" required>
+          </div>
+          <div class="col-md-4">
+            <label for="inputState" class="form-label">State</label>
+            <select id="inputState" class="form-select" required>
+              <option selected disabled>Choose your state</option>
+              <option>Karnataka</option>
+              <option>Maharashtra</option>
+              <option>Kerala</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="inputZip" class="form-label">Zip</label>
+            <input type="text" class="form-control" id="inputZip" required>
+          </div>
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary px-5">Sign Up</button>
+          </div>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
         <a href="cart.html" class="text-light text-decoration-none text-center">
           <i class="bi bi-cart fs-4"></i><br><small>Cart</small>
         </a>
